@@ -1,120 +1,99 @@
+# API TechCollab
 
------
+**Conecte empresas, profissionais e oportunidades em projetos colaborativos de tecnologia.**
 
-# API TechCollab 🚀
+Backend REST para uma plataforma em que empresas publicam projetos e vagas, profissionais registram interesse e equipes são organizadas para executar o trabalho. O repositório concentra os contratos HTTP, a camada de serviços, a persistência e a documentação OpenAPI.
 
-## 📖 Sobre o Projeto
+[Recursos](#recursos) · [Arquitetura](#arquitetura) · [Executar](#como-executar) · [API](#explorar-a-api)
 
-**TechCollab** é uma plataforma de conexão para projetos colaborativos de TI, com o objetivo de facilitar a interação e o gerenciamento entre empresas que buscam desenvolver projetos e profissionais que procuram oportunidades de trabalho de curta duração. A plataforma permite que empresas publiquem projetos detalhando os perfis necessários e que profissionais se candidatem, formem equipes e entreguem esses projetos.
+## Recursos
 
-Esta API foi desenvolvida como a espinha dorsal da plataforma, fornecendo todos os serviços necessários para o cadastro de usuários, gerenciamento de projetos, vagas, equipes e candidaturas.
+| Domínio | Finalidade |
+| --- | --- |
+| Empresas | Cadastro e gerenciamento de perfis e projetos. |
+| Profissionais | Cadastro e informações para participação nos projetos. |
+| Projetos | Publicação, consulta de disponíveis, detalhes, edição e exclusão. |
+| Vagas | Definição das oportunidades e perfis requeridos por projeto. |
+| Interesses | Registro e acompanhamento das candidaturas. |
+| Equipes | Organização dos profissionais selecionados. |
+| Contratos | DTOs e documentação interativa com Springdoc OpenAPI. |
 
------
+## Arquitetura
 
-## ✨ Funcionalidades Principais
+```mermaid
+flowchart LR
+    C[Cliente HTTP] --> R[Controllers REST]
+    R --> S[Serviços de domínio]
+    S --> J[Spring Data JPA]
+    J --> D[(MySQL)]
+    F[Migrações Flyway] --> D
+```
 
-* **Gestão de Perfis**: Cadastro e gerenciamento de perfis para **Empresas** e **Profissionais**.
-* **Publicação de Projetos**: Empresas podem criar, editar e excluir projetos, detalhando escopo, orçamento e prazo.
-* **Criação de Vagas**: Empresas podem definir vagas específicas para seus projetos, com habilidades e níveis de experiência requeridos.
-* **Busca e Candidatura**: Profissionais podem buscar projetos disponíveis e manifestar interesse nas vagas.
-* **Formação de Equipes**: Empresas podem selecionar candidatos e montar as equipes para seus projetos.
-* **Navegabilidade com HATEOAS**: A API utiliza os princípios HATEOAS para fornecer links que guiam o cliente através das ações e recursos disponíveis.
-* **Documentação Interativa com Swagger**: Documentação completa e interativa gerada automaticamente com Springdoc OpenAPI.
+O manifesto declara **Spring Boot 3.4.6**, Spring Web, Data JPA, HATEOAS, Validation, Caffeine, Flyway, MySQL Connector/J, ModelMapper e Springdoc 2.8.8.
 
------
+Há uma diferença no alvo Java do POM: a propriedade `java.version` está em **22**, enquanto o plugin do compilador explicita `source` e `target` em **21**. Use JDK 22 para reproduzir esta configuração e revise os parâmetros efetivos antes de padronizar o build em outra versão.
 
-## 🛠️ Tecnologias Utilizadas
+## Como executar
 
-Este projeto foi construído com as seguintes tecnologias:
-
-* **Backend**:
-    * **Java 21**
-    * **Spring Boot 3.3.0**
-    * **Spring Data JPA** (Hibernate) para persistência de dados.
-    * **Spring Web** para a construção da API REST.
-    * **Spring HATEOAS** para a implementação de hipermídia.
-    * **Caffeine Cache** para gerenciamento de cache de alta performance.
-* **Banco de Dados**:
-    * **MySQL**
-    * **Flyway** para o versionamento e migração do schema do banco de dados.
-* **Build e Dependências**:
-    * **Maven**
-* **Documentação da API**:
-    * **Springdoc OpenAPI (Swagger)**
-
------
-
-## 🚀 Como Executar o Projeto
-
-Siga os passos abaixo para configurar e executar a aplicação localmente.
-
-### Pré-requisitos
-
-* **Java Development Kit (JDK) 21** ou superior.
-* **Apache Maven** 3.8 ou superior.
-* **MySQL Server** 8.0 ou superior.
-* Uma IDE de sua preferência (IntelliJ, VS Code, Eclipse, etc.).
-* Um cliente de API como o **Postman** (opcional, pois o Swagger já oferece uma interface de testes).
-
-### 1\. Clonar o Repositório
+Prepare JDK 22, Maven e um MySQL de desenvolvimento. Não utilize um banco que contenha dados de produção para a primeira execução.
 
 ```bash
-git clone https://github.com/seu-usuario/api-techcollab.git
+git clone https://github.com/dlr-1337/api-techcollab.git
 cd api-techcollab
 ```
 
-### 2\. Configurar o Banco de Dados
-
-A aplicação utiliza o **Flyway** para criar e popular o banco de dados automaticamente. Você só precisa criar o banco de dados vazio.
-
-a. Conecte-se ao seu servidor MySQL e execute o seguinte comando:
+Crie o banco vazio:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS api_techcollab_database;
 ```
 
-b. Configure suas credenciais de acesso ao banco no arquivo `src/main/resources/application.yml`:
+A configuração da aplicação está em [`src/main/resources/application.yml`](src/main/resources/application.yml). Substitua as credenciais de exemplo por variáveis privadas do ambiente:
 
-```yaml
-spring:
-  # ... outras configurações ...
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/api_techcollab_database?useTimezone=true&serverTimezone=UTC
-    username: SEU_USUARIO_MYSQL # <-- Altere aqui
-    password: SUA_SENHA_MYSQL   # <-- Altere aqui
-  # ...
-```
-
-### 3\. Executar a Aplicação
-
-Use o Maven para compilar e iniciar a aplicação:
+| Variável | Valor a configurar |
+| --- | --- |
+| `SPRING_DATASOURCE_URL` | URL JDBC do banco de desenvolvimento. |
+| `SPRING_DATASOURCE_USERNAME` | Usuário restrito ao banco utilizado. |
+| `SPRING_DATASOURCE_PASSWORD` | Senha privada, não versionada. |
 
 ```bash
 mvn spring-boot:run
 ```
 
-A API estará rodando em `http://localhost:8080`.
+Com a configuração de porta padrão, a aplicação atende em **http://localhost:8080**. O projeto utiliza Flyway e também declara `spring.jpa.hibernate.ddl-auto=update`; revise essa combinação antes de adotá-la em uma implantação com dados importantes.
 
------
+O plugin Maven do Flyway possui configuração própria no POM, diferente da conexão de runtime. Não suponha que executar um comando `flyway:*` use automaticamente o mesmo banco da aplicação.
 
-## 📄 Documentação da API (Swagger)
+## Explorar a API
 
-Com a aplicação em execução, você pode acessar a documentação interativa da API gerada pelo Swagger. Ela permite visualizar todos os endpoints, testá-los e ver os modelos de dados.
+Abra a [interface Swagger local](http://localhost:8080/swagger-ui.html) com o servidor em execução. Ela apresenta os contratos disponíveis e os modelos de requisição.
 
-➡️ **Acesse a UI do Swagger em:** [**http://localhost:8080/swagger-ui.html**](https://www.google.com/search?q=http://localhost:8080/swagger-ui.html)
+Exemplos confirmados em [`ProjetoController.java`](src/main/java/br/com/api_techcollab/controller/ProjetoController.java):
 
------
+| Método | Rota | Ação |
+| --- | --- | --- |
+| `GET` | `/api/projetos/disponiveis` | Consultar projetos disponíveis. |
+| `GET` | `/api/projetos/{projetoId}` | Consultar um projeto. |
+| `PUT` | `/api/projetos/{projetoId}` | Editar usando `ProjetoUpdateDTO`. |
+| `DELETE` | `/api/projetos/{projetoId}?empresaId=...` | Excluir a partir do identificador informado. |
 
-## 🗺️ Visão Geral dos Endpoints Principais
+Os demais recursos são organizados nos controllers de empresas, profissionais, vagas, interesses e equipes. Para testar o fluxo, comece pelos cadastros, publique o projeto e suas vagas, registre os interesses e acompanhe a formação da equipe pelo contrato disponível no Swagger.
 
-| Recurso | Endpoint Base | Descrição |
-| :--- | :--- |:---|
-| **Empresas** | `/api/empresas` | Gerenciamento de perfis de empresas e seus projetos. |
-| **Profissionais** | `/api/profissionais` | Gerenciamento de perfis de profissionais e suas candidaturas. |
-| **Projetos** | `/api/projetos` | Ações gerais sobre projetos, como busca e visualização. |
-| **Vagas** | `/api/projetos/{id}/vagas` | Gerenciamento de vagas dentro de um projeto. |
-| **Interesses** | `/api/profissionais/{id}/interesses` ou `/api/empresas/{id}/...`| Gestão de candidaturas, tanto pela perspectiva da empresa quanto do profissional. |
-| **Equipes** | `/api/projetos/{id}/equipe` | Montagem e visualização da equipe de um projeto. |
+## Organização e verificação
 
------
+Base Java: [`src/main/java/br/com/api_techcollab`](src/main/java/br/com/api_techcollab/).
+
+| Caminho | Conteúdo |
+| --- | --- |
+| `controller` | Endpoints REST. |
+| `dto` | Contratos de entrada e resposta. |
+| `services` | Operações da plataforma. |
+| `config` | Configuração, incluindo OpenAPI. |
+| `src/main/resources` | Ambiente e recursos da aplicação. |
+
+```bash
+mvn test
+mvn package
+```
+
+Identificadores de empresa recebidos no corpo ou na URL não demonstram, por si só, a identidade de quem está chamando a API. Revise autenticação, autorização e tratamento de credenciais antes de expor uma implantação a usuários externos. Este repositório documenta o backend; não inclui uma interface web de portfólio para ilustrar como se fosse um produto frontend.
